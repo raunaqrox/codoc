@@ -8,7 +8,7 @@ type Doc struct {
 
 type DocInputFormat struct {
 	Meta   Meta   `json:"meta"`
-	ToC    string `json:"table_of_contents"`
+	Toc    string `json:"table_of_contents"`
 	Topic  string `json:"topic"`
 	Para   string `json:"para"`
 	Format string `json:"format"`
@@ -19,18 +19,13 @@ type Meta struct {
 	name string
 }
 
+// Each element of table of content
 type TocElem struct {
-	Name string
-	Link string
+	Name string // name of toc element
+	Link string // href of associated anchor tag
+	// maybe even the topic to which it links
 }
 
 type DocOutputFormat struct {
-	TableOfContents TocElem
-}
-
-func NewTocElem(name, link string) *TocElem {
-	return &TocElem{
-		name,
-		link,
-	}
+	TableOfContents []*TocElem
 }

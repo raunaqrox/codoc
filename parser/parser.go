@@ -12,7 +12,7 @@ import (
 
 type Parsed struct {
 	DocInfo   types.Doc
-	ParsedDoc string `json:"doc"`
+	ParsedDoc *types.DocOutputFormat
 }
 
 func init() {
@@ -21,6 +21,9 @@ func init() {
 
 var dat types.DocInputFormat
 
+// Parse the http response to html document
+// apply the selections from the documentation json
+// return with the documentation format
 func Parse(toParse *http.Response, docInfo types.Doc) (*Parsed, error) {
 	fileData, err := utils.ReadFile("./docsjson/" + docInfo.DocName + ".json")
 	_ = err
@@ -31,21 +34,25 @@ func Parse(toParse *http.Response, docInfo types.Doc) (*Parsed, error) {
 	_ = doc
 	_ = err
 
-	tableOfContents := doc.Find(dat.ToC)
-	fmt.Println(tableOfContents.Nodes)
-	_ = tableOfContents
-	printNodes(tableOfContents)
+	tableOfContents := doc.Find(dat.Toc)
+	toc := createDocToc(tableOfContents)
+	fmt.Println(toc)
 	return &Parsed{
 		DocInfo:   docInfo,
-		ParsedDoc: "",
+		ParsedDoc: types.NewDocOutputFormat(toc),
 	}, nil
 }
 
-func printNodes(selection *goquery.Selection) {
+// create the table of contents of the documentation
+func createDocToc(selection *goquery.Selection) []*types.TocElem {
+	tableOfContents := make([]*types.TocElem, len(selection.Nodes))
 	selection.Each(func(index int, elem *goquery.Selection) {
 		name := elem.Text()
+		// resolve the href with the correct url
+		// fetch the current url and add it to it
 		url, _ := elem.Attr("href")
 		toc := types.NewTocElem(name, url)
-		fmt.Println(toc)
+		tableOfContents[index] = toc
 	})
+	return tableOfContents
 }

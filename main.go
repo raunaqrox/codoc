@@ -1,6 +1,7 @@
 package main
 
 import (
+	"codoc/config"
 	"codoc/downloader"
 	"codoc/errors"
 	"codoc/messages"
@@ -38,4 +39,5 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println(config.Config["homeFolder"])
 }

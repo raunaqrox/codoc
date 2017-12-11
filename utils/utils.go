@@ -9,3 +9,11 @@ func ReadFile(path string) ([]byte, error) {
 	}
 	return dat, nil
 }
+
+func WriteFile(path string, data []byte) error {
+	err := ioutil.WriteFile(path, data, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
