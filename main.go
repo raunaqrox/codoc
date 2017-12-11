@@ -1,7 +1,6 @@
 package main
 
 import (
-	"codoc/config"
 	"codoc/downloader"
 	"codoc/errors"
 	"codoc/fs"
@@ -18,10 +17,21 @@ func init() {
 	// first check if codoc is initialized
 	// if the folder exists, config exists and flag is true
 	// if all three false keep trying to do all 3 until they match
+	if exists, _ := utils.FolderExists(utils.GetCodocFolder()); !exists {
+		fs.CreateDirectoryIfNotExists(utils.GetCodocFolder())
+	}
 
-	// create directory at home folder
-	// TODO make it platform agnostic
-	fs.CreateDirectoryIfNotExists(filepath.Join(utils.GetHomeFolder(), config.Config["codocFolder"]))
+}
+
+func installDoc(docName string) {
+	doc, err := downloader.GetDoc(docName)
+
+	if err == nil {
+		fmt.Printf(messages.Messages["downloadingDoc"], docName)
+		// TODO put in separate file
+		fmt.Println(messages.Messages["successDocDownload"])
+		saveDoc(doc)
+	}
 }
 
 func handleArgs(args []string) error {
@@ -34,22 +44,25 @@ func handleArgs(args []string) error {
 		// check of the doc already exists
 		// check if a more recent version exists
 		// else download and store it
-
-		doc, err := downloader.GetDoc(args[1])
-
-		if err == nil {
-			fmt.Printf(messages.Messages["downloadingDoc"], args[1])
-			// TODO put in separate file
-			fmt.Println(messages.Messages["successDocDownload"])
-			saveDoc(doc)
-			// write to file in correct structure
-			return nil
+		if utils.IsDocInstalled(args[1]) {
+			fmt.Println("Node.js is already installed!")
+			return nil // TODO create codoc error
+		} else {
+			installDoc(args[1])
 		}
 
 	case "del":
 		fmt.Println("tes")
 	case "list":
-		fmt.Println("te")
+		docs := utils.ListFilesInFolder(utils.GetCodocFolder())
+		if len(docs) == 0 {
+			fmt.Print("No doc installed")
+			return nil // TODO create a codoc error and return that here
+		}
+
+		for _, doc := range docs {
+			fmt.Println(doc.Name())
+		}
 	}
 	return nil
 }
@@ -57,7 +70,7 @@ func handleArgs(args []string) error {
 func saveDoc(doc *types.Parsed) {
 	res, err := json.Marshal(doc.ParsedDoc.Toc)
 	_ = err
-	docJsonPath := filepath.Join(utils.GetHomeFolder(), config.Config["codocFolder"], doc.DocInfo.DocName+".json")
+	docJsonPath := filepath.Join(utils.GetCodocFolder(), doc.DocInfo.DocName+".json")
 	err = fs.WriteFile(docJsonPath, res)
 	if err != nil {
 		panic(err)
@@ -70,5 +83,4 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(config.Config["homeFolder"])
 }
