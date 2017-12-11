@@ -4,10 +4,25 @@ import (
 	"codoc/config"
 	"codoc/downloader"
 	"codoc/errors"
+	"codoc/fs"
 	"codoc/messages"
+	"codoc/types"
+	"codoc/utils"
+	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 )
+
+func init() {
+	// first check if codoc is initialized
+	// if the folder exists, config exists and flag is true
+	// if all three false keep trying to do all 3 until they match
+
+	// create directory at home folder
+	// TODO make it platform agnostic
+	fs.CreateDirectoryIfNotExists(filepath.Join(utils.GetHomeFolder(), config.Config["codocFolder"]))
+}
 
 func handleArgs(args []string) error {
 	switch args[0] {
@@ -26,7 +41,8 @@ func handleArgs(args []string) error {
 			fmt.Printf(messages.Messages["downloadingDoc"], args[1])
 			// TODO put in separate file
 			fmt.Println(messages.Messages["successDocDownload"])
-			_ = doc
+			saveDoc(doc)
+			// write to file in correct structure
 			return nil
 		}
 
@@ -36,6 +52,16 @@ func handleArgs(args []string) error {
 		fmt.Println("te")
 	}
 	return nil
+}
+
+func saveDoc(doc *types.Parsed) {
+	res, err := json.Marshal(doc.ParsedDoc.Toc)
+	_ = err
+	docJsonPath := filepath.Join(utils.GetHomeFolder(), config.Config["codocFolder"], doc.DocInfo.DocName+".json")
+	err = fs.WriteFile(docJsonPath, res)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {

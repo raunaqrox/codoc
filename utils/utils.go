@@ -1,19 +1,13 @@
 package utils
 
-import "io/ioutil"
+import (
+	"os/user"
+)
 
-func ReadFile(path string) ([]byte, error) {
-	dat, err := ioutil.ReadFile(path)
+func GetHomeFolder() string {
+	usr, err := user.Current()
 	if err != nil {
-		return nil, err
+		panic(err) // TODO find better way to handle this
 	}
-	return dat, nil
-}
-
-func WriteFile(path string, data []byte) error {
-	err := ioutil.WriteFile(path, data, 0644)
-	if err != nil {
-		return err
-	}
-	return nil
+	return usr.HomeDir
 }
