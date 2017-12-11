@@ -16,12 +16,17 @@ func handleArgs(args []string) error {
 			return errors.ThrowArgumentError("Which documentation to get is not specified")
 		}
 
-		err := downloader.GetDoc(args[1])
+		// check of the doc already exists
+		// check if a more recent version exists
+		// else download and store it
+
+		doc, err := downloader.GetDoc(args[1])
 
 		if err == nil {
 			fmt.Printf(messages.Messages["downloadingDoc"], args[1])
-			// put in separate file
+			// TODO put in separate file
 			fmt.Println(messages.Messages["successDocDownload"])
+			_ = doc
 			return nil
 		}
 

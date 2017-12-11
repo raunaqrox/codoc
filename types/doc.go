@@ -26,6 +26,15 @@ type TocElem struct {
 	// maybe even the topic to which it links
 }
 
+type TableOfContents struct {
+	Toc []*TocElem
+}
+
 type DocOutputFormat struct {
-	TableOfContents []*TocElem
+	Toc *TableOfContents
+}
+
+type Parsed struct {
+	DocInfo   Doc
+	ParsedDoc *DocOutputFormat
 }

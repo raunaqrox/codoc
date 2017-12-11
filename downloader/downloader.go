@@ -25,7 +25,7 @@ func isAllowedDoc(docName string) bool {
 	return false
 }
 
-func GetDoc(docName string) error {
+func GetDoc(docName string) (*types.Parsed, error) {
 	// first check if the docs have already been downloaded
 	// we need versioning for the docs
 	if isAllowedDoc(docName) {
@@ -34,17 +34,17 @@ func GetDoc(docName string) error {
 
 		// network error occured
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		parsedOutput, err := parser.Parse(httpResp, types.Doc{DocName: docName, DocUrl: url, DocPath: ""})
-
-		_ = parsedOutput
-		_ = err
-
-		return nil
+		// TODO: conver to parse error
+		if err != nil {
+			return nil, err
+		}
+		return parsedOutput, err
 	}
-	return errors.ThrowDocError("Unknown doc name", docName)
+	return nil, errors.ThrowDocError("Unknown doc name", docName)
 }
 
 func httpRespToBuffer(bodyReader io.ReadCloser) ([]byte, error) {
