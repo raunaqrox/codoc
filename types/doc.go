@@ -27,7 +27,7 @@ type TocElem struct {
 }
 
 type TableOfContents struct {
-	Toc []*TocElem
+	Toc []*TocElem `json:"Toc"`
 }
 
 type DocOutputFormat struct {

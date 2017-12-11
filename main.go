@@ -35,34 +35,49 @@ func installDoc(docName string) {
 }
 
 func handleArgs(args []string) error {
-	switch args[0] {
-	case "get":
-		if len(args) < 2 || args[1] == "" {
-			return errors.ThrowArgumentError("Which documentation to get is not specified")
+	if !(len(args) == 0) {
+		switch args[0] {
+		case "get":
+			if len(args) < 2 || args[1] == "" {
+				return errors.ThrowArgumentError("Which documentation to get is not specified")
+			}
+
+			// check of the doc already exists
+			// check if a more recent version exists
+			// else download and store it
+			if utils.IsDocInstalled(args[1]) {
+				fmt.Println("Node.js is already installed!")
+				return nil // TODO create codoc error
+			} else {
+				installDoc(args[1])
+			}
+
+		case "del":
+			fmt.Println("tes")
+		case "list":
+			docs := utils.GetDocList(utils.GetCodocFolder())
+			if len(docs) == 0 {
+				fmt.Print("No doc installed")
+				return nil // TODO create a codoc error and return that here
+			}
+
+			for _, doc := range docs {
+				fmt.Println(doc)
+			}
+		default:
+			if utils.IsAllowedDoc(args[0]) {
+				// list the table of contents of nodejs
+				docOutput, err := utils.GetDoc(args[0])
+				if err != nil {
+					panic(err)
+				}
+				for _, toc := range docOutput.Toc {
+					fmt.Printf("%s\n", toc.Name)
+				}
+
+			}
 		}
 
-		// check of the doc already exists
-		// check if a more recent version exists
-		// else download and store it
-		if utils.IsDocInstalled(args[1]) {
-			fmt.Println("Node.js is already installed!")
-			return nil // TODO create codoc error
-		} else {
-			installDoc(args[1])
-		}
-
-	case "del":
-		fmt.Println("tes")
-	case "list":
-		docs := utils.ListFilesInFolder(utils.GetCodocFolder())
-		if len(docs) == 0 {
-			fmt.Print("No doc installed")
-			return nil // TODO create a codoc error and return that here
-		}
-
-		for _, doc := range docs {
-			fmt.Println(doc.Name())
-		}
 	}
 	return nil
 }

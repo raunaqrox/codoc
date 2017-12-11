@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"codoc/fs"
+	"codoc/types"
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"os/user"
@@ -49,14 +52,13 @@ func ListFilesInFolder(path string) []os.FileInfo {
 	return files
 }
 
-func GetDocPath(docName string) string {
-	return filepath.Join(GetCodocFolder(), docName+".json")
-}
+func ReadDocJson(path string) (*types.DocInputFormat, error) {
+	var jsonStruct types.DocInputFormat
 
-func IsDocInstalled(docName string) bool {
-	exists, err := FolderExists(GetDocPath(docName))
-	if err != nil {
-		panic(err)
+	fileData, err := fs.ReadFile(path)
+
+	if err = json.Unmarshal(fileData, &jsonStruct); err != nil {
+		return nil, err
 	}
-	return exists
+	return &jsonStruct, nil
 }

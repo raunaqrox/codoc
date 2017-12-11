@@ -4,31 +4,20 @@ import (
 	"codoc/errors"
 	"codoc/parser"
 	"codoc/types"
+	"codoc/utils"
 	"io"
 	"io/ioutil"
 	"net/http"
 )
 
-// TODO: add aliases as well for each
-var allowedDocs = [...]string{"nodejs", "golang"}
-
 var docLinks = map[string]string{
-	"nodejs": "https://nodejs.org/dist/latest-v9.x/docs/api/",
-}
-
-func isAllowedDoc(docName string) bool {
-	for _, doc := range allowedDocs {
-		if doc == docName {
-			return true
-		}
-	}
-	return false
+	"nodejs": "https://nodejs.org/api",
 }
 
 func GetDoc(docName string) (*types.Parsed, error) {
 	// first check if the docs have already been downloaded
 	// we need versioning for the docs
-	if isAllowedDoc(docName) {
+	if utils.IsAllowedDoc(docName) {
 		url := docLinks[docName]
 		httpResp, err := syncGet(url)
 

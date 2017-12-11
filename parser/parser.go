@@ -1,10 +1,10 @@
 package parser
 
 import (
-	"codoc/fs"
 	"codoc/types"
-	"encoding/json"
+	"codoc/utils"
 	"net/http"
+	"path/filepath"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -13,19 +13,15 @@ import (
 // apply the selections from the documentation json
 // return with the documentation format
 func Parse(toParse *http.Response, docInfo types.Doc) (*types.Parsed, error) {
-	var dat types.DocInputFormat
-	fileData, err := fs.ReadFile("./docsjson/" + docInfo.DocName + ".json")
+	jsonStruct, err := utils.ReadDocJson(filepath.Join("./docsjson/", docInfo.DocName+".json"))
 	_ = err
-	if err := json.Unmarshal(fileData, &dat); err != nil {
-		return nil, err
-	}
 	doc, err := goquery.NewDocumentFromResponse(toParse)
 
 	if err != nil {
 		return nil, err
 	}
 
-	tableOfContents := doc.Find(dat.Toc)
+	tableOfContents := doc.Find(jsonStruct.Toc)
 	toc := createDocToc(tableOfContents)
 	toc.Transform()
 	return &types.Parsed{
