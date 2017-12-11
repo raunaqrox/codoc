@@ -4,7 +4,6 @@ import (
 	"codoc/errors"
 	"codoc/parser"
 	"codoc/types"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -14,7 +13,7 @@ import (
 var allowedDocs = [...]string{"nodejs", "golang"}
 
 var docLinks = map[string]string{
-	"nodejs": "https://nodejs.org/en/docs/",
+	"nodejs": "https://nodejs.org/dist/latest-v9.x/docs/api/",
 }
 
 func isAllowedDoc(docName string) bool {
@@ -38,17 +37,11 @@ func GetDoc(docName string) error {
 			return err
 		}
 
-		bodyBuffer, err := httpRespToBuffer(httpResp.Body)
+		parsedOutput, err := parser.Parse(httpResp, types.Doc{DocName: docName, DocUrl: url, DocPath: ""})
 
-		if err != nil {
-			return err
-		}
+		_ = parsedOutput
+		_ = err
 
-		parsedOutput := parser.Parse(string(bodyBuffer), types.Doc{DocName: docName, DocUrl: url, DocPath: ""})
-
-		fmt.Printf("parsed output %s", parsedOutput)
-
-		fmt.Printf("%v", string(bodyBuffer))
 		return nil
 	}
 	return errors.ThrowDocError("Unknown doc name", docName)
@@ -72,23 +65,3 @@ func syncGet(url string) (*http.Response, error) {
 	}
 	return resp, nil
 }
-
-// func asyncHttpGet(url string) *HttpResponse {
-// 	ch := make(chan *HttpResponse)
-// 	go func(url string) {
-// 		fmt.Printf("fetching %s \n", url)
-// 		resp, err := http.Get(url)
-// 		defer resp.Body.Close()
-// 		ch <- &HttpResponse{url, resp, err}
-// 	}(url)
-
-// 	for {
-// 		select {
-// 		case r := <-ch:
-// 			fmt.Printf("\n%s was fetched \n", r.url)
-// 			return r
-// 		case <-time.After(50 * time.Millisecond):
-// 			fmt.Printf(".")
-// 		}
-// 	}
-// }
