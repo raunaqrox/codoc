@@ -21,9 +21,27 @@ type Meta struct {
 
 // Each element of table of content
 type TocElem struct {
-	Name string // name of toc element
-	Link string // href of associated anchor tag
-	// maybe even the topic to which it links
+	Name        string // name of toc element
+	Link        string // href of associated anchor tag
+	TocPageData NullDocPage
+}
+
+// indicating that the page would be null when valid is false
+type NullDocPage struct {
+	LocalToc *TableOfContents
+	MetaData interface{}
+	Topic    Section
+	Valid    bool // added like NullString, to know if the value is present at the moment or not
+}
+
+type Explanation struct {
+	Explanation string
+	Example     string
+}
+
+type Section struct {
+	Topic       string
+	Explanation []Explanation
 }
 
 type TableOfContents struct {
@@ -32,6 +50,7 @@ type TableOfContents struct {
 
 type DocOutputFormat struct {
 	Toc *TableOfContents
+	// add [] Section
 }
 
 type Parsed struct {

@@ -65,7 +65,9 @@ func handleArgs(args []string) error {
 				fmt.Println(doc)
 			}
 		default:
-			if utils.IsAllowedDoc(args[0]) {
+			// TODO: turn this into a single fn, which get's the allowed
+			// docs from the installed docs folder for now
+			if utils.IsAllowedDoc(args[0]) && utils.IsDocInstalled(args[0]) {
 				// list the table of contents of nodejs
 				docOutput, err := utils.GetDoc(args[0])
 				if err != nil {

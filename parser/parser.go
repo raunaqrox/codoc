@@ -12,7 +12,7 @@ import (
 // Parse the http response to html document
 // apply the selections from the documentation json
 // return with the documentation format
-func Parse(toParse *http.Response, docInfo types.Doc) (*types.Parsed, error) {
+func ParseTableOfContents(toParse *http.Response, docInfo types.Doc) (*types.TableOfContents, error) {
 	jsonStruct, err := utils.ReadDocJson(filepath.Join("./docsjson/", docInfo.DocName+".json"))
 	_ = err
 	doc, err := goquery.NewDocumentFromResponse(toParse)
@@ -22,12 +22,14 @@ func Parse(toParse *http.Response, docInfo types.Doc) (*types.Parsed, error) {
 	}
 
 	tableOfContents := doc.Find(jsonStruct.Toc)
-	toc := createDocToc(tableOfContents)
-	toc.Transform()
-	return &types.Parsed{
-		DocInfo:   docInfo,
-		ParsedDoc: types.NewDocOutputFormat(toc),
-	}, nil
+
+	return createDocToc(tableOfContents), nil
+	// TODO use this somewhere later
+	// toc.Transform()
+	// return &types.Parsed{
+	// 	DocInfo:   docInfo,
+	// 	ParsedDoc: types.NewDocOutputFormat(toc),
+	// }, nil
 }
 
 // create the table of contents of the documentation

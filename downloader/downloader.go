@@ -26,7 +26,7 @@ func GetDoc(docName string) (*types.Parsed, error) {
 			return nil, err
 		}
 
-		parsedOutput, err := parser.Parse(httpResp, types.Doc{DocName: docName, DocUrl: url, DocPath: ""})
+		parsedOutput, err := parser.ParseTableOfContents(httpResp, types.Doc{DocName: docName, DocUrl: url, DocPath: ""})
 		// TODO: conver to parse error
 		if err != nil {
 			return nil, err
