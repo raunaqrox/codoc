@@ -2,26 +2,27 @@ package parser
 
 import (
 	"codoc/types"
-	"codoc/utils"
 	"net/http"
-	"path/filepath"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
+func ParseDocumentationPage(toParse *http.Response) *types.DocPage {
+	// topics :=
+	return nil
+}
+
 // Parse the http response to html document
 // apply the selections from the documentation json
 // return with the documentation format
-func ParseTableOfContents(toParse *http.Response, docInfo types.Doc) (*types.TableOfContents, error) {
-	jsonStruct, err := utils.ReadDocJson(filepath.Join("./docsjson/", docInfo.DocName+".json"))
-	_ = err
+func ParseTableOfContents(toParse *http.Response, docInfo types.Doc, toc string) (*types.TableOfContents, error) {
 	doc, err := goquery.NewDocumentFromResponse(toParse)
 
 	if err != nil {
 		return nil, err
 	}
 
-	tableOfContents := doc.Find(jsonStruct.Toc)
+	tableOfContents := doc.Find(toc)
 
 	return createDocToc(tableOfContents), nil
 	// TODO use this somewhere later

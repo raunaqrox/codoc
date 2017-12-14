@@ -5,13 +5,32 @@ import (
 	"codoc/parser"
 	"codoc/types"
 	"codoc/utils"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
 )
 
 var docLinks = map[string]string{
-	"nodejs": "https://nodejs.org/api",
+	"nodejs": "https://nodejs.org/api/",
+}
+
+func getDocPages(toc *types.TableOfContents, baseUrl string) ([]*http.Response, error) {
+	result := make([]*http.Response, len(toc.Toc))
+	for i, topic := range toc.Toc {
+		resolvedUrl, err := utils.ResolveUrl(baseUrl, topic.Link)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := syncGet(resolvedUrl.String())
+		fmt.Println("got ", topic.Name)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = resp
+	}
+	return result, nil
 }
 
 func GetDoc(docName string) (*types.Parsed, error) {
@@ -20,18 +39,27 @@ func GetDoc(docName string) (*types.Parsed, error) {
 	if utils.IsAllowedDoc(docName) {
 		url := docLinks[docName]
 		httpResp, err := syncGet(url)
-
 		// network error occured
 		if err != nil {
 			return nil, err
 		}
 
-		parsedOutput, err := parser.ParseTableOfContents(httpResp, types.Doc{DocName: docName, DocUrl: url, DocPath: ""})
-		// TODO: conver to parse error
+		jsonStruct, err := utils.ReadDocJson(filepath.Join("./docsjson/", docName+".json"))
+		_ = err
+
+		tableOfContents, err := parser.ParseTableOfContents(httpResp, types.Doc{DocName: docName, DocUrl: url, DocPath: ""}, jsonStruct.Toc)
+		docPages, err := getDocPages(tableOfContents, url)
+		_ = err
+		fmt.Println(docPages)
+		s, err := httpRespToBuffer(docPages[0].Body)
+		_ = err
+		fmt.Println(string(s))
+		// TODO: convert to parse error
 		if err != nil {
 			return nil, err
 		}
-		return parsedOutput, err
+
+		return nil, err
 	}
 	return nil, errors.ThrowDocError("Unknown doc name", docName)
 }

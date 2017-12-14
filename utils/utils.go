@@ -5,6 +5,7 @@ import (
 	"codoc/types"
 	"encoding/json"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -61,4 +62,18 @@ func ReadDocJson(path string) (*types.DocInputFormat, error) {
 		return nil, err
 	}
 	return &jsonStruct, nil
+}
+
+func ResolveUrl(baseUrl, toJoin string) (*url.URL, error) {
+	u, err := url.Parse(toJoin)
+	if err != nil {
+		return nil, err
+	}
+
+	base, err := url.Parse(baseUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	return base.ResolveReference(u), nil
 }

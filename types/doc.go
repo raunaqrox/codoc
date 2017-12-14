@@ -21,17 +21,15 @@ type Meta struct {
 
 // Each element of table of content
 type TocElem struct {
-	Name        string // name of toc element
-	Link        string // href of associated anchor tag
-	TocPageData NullDocPage
+	Name string // name of toc element
+	Link string // href of associated anchor tag
 }
 
 // indicating that the page would be null when valid is false
-type NullDocPage struct {
+type DocPage struct {
 	LocalToc *TableOfContents
 	MetaData interface{}
-	Topic    Section
-	Valid    bool // added like NullString, to know if the value is present at the moment or not
+	Sections []Section
 }
 
 type Explanation struct {

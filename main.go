@@ -30,7 +30,9 @@ func installDoc(docName string) {
 		fmt.Printf(messages.Messages["downloadingDoc"], docName)
 		// TODO put in separate file
 		fmt.Println(messages.Messages["successDocDownload"])
-		saveDoc(doc)
+		if doc != nil {
+			saveDoc(doc)
+		}
 	}
 }
 
@@ -70,12 +72,13 @@ func handleArgs(args []string) error {
 			if utils.IsAllowedDoc(args[0]) && utils.IsDocInstalled(args[0]) {
 				// list the table of contents of nodejs
 				docOutput, err := utils.GetDoc(args[0])
+				_ = docOutput
 				if err != nil {
 					panic(err)
 				}
-				for _, toc := range docOutput.Toc {
-					fmt.Printf("%s\n", toc.Name)
-				}
+				// for _, toc := range docOutput.Toc {
+				// 	fmt.Printf("%s\n", toc.Name)
+				// }
 
 			}
 		}

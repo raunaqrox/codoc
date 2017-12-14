@@ -11,12 +11,10 @@ var docKeyHandlers = map[string]interface{}{
 }
 */
 
-func NewDocPage(toc *TableOfContents, meta interface{}, topic Section, validity bool) *NullDocPage {
-	return &NullDocPage{
-		toc,
-		meta,
-		topic,
-		validity,
+func NewDocPage(toc *TableOfContents, meta interface{}) *DocPage {
+	return &DocPage{
+		LocalToc: toc,
+		MetaData: meta,
 	}
 }
 
@@ -35,12 +33,9 @@ func NewSection(topic string, explanation []Explanation) Section {
 }
 
 func NewTocElem(name, link string) *TocElem {
-	section := NewSection("", []Explanation{})
-	docPage := NewDocPage(&TableOfContents{}, nil, section, false)
 	return &TocElem{
 		name,
 		link,
-		*docPage,
 	}
 }
 
