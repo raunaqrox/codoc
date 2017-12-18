@@ -1,5 +1,11 @@
 package types
 
+import (
+	"fmt"
+
+	"github.com/PuerkitoBio/goquery"
+)
+
 // temporary way for now to handle transformations
 // for each key with selector to help parse the page
 // we get the element and call the corresponding function written here
@@ -45,10 +51,20 @@ func NewDocOutputFormat(todoElems *TableOfContents) *DocOutputFormat {
 	}
 }
 
-type Handlers interface {
+type DocType interface {
 	Transform() interface{}
 }
 
 func (toc *TableOfContents) Transform() interface{} {
 	return toc.Toc
+}
+
+func (nodeDoc *Nodejs) Transform() *Section {
+	fmt.Println(len(nodeDoc.DocContent.Nodes))
+	nodeDoc.DocContent.Each(func(i int, elem *goquery.Selection) {
+		if elem.Nodes[0].Data == "h1" {
+			fmt.Println(elem.Text())
+		}
+	})
+	return &Section{}
 }

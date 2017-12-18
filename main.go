@@ -31,7 +31,7 @@ func installDoc(docName string) {
 		// TODO put in separate file
 		fmt.Println(messages.Messages["successDocDownload"])
 		if doc != nil {
-			saveDoc(doc)
+			// saveDoc(doc)
 		}
 	}
 }
@@ -50,8 +50,10 @@ func handleArgs(args []string) error {
 			if utils.IsDocInstalled(args[1]) {
 				fmt.Println("Node.js is already installed!")
 				return nil // TODO create codoc error
-			} else {
+			} else if utils.IsAllowedDoc(args[1]) {
 				installDoc(args[1])
+			} else {
+				fmt.Println(args[1], " not allowed")
 			}
 
 		case "del":

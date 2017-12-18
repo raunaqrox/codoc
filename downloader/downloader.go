@@ -16,7 +16,8 @@ var docLinks = map[string]string{
 	"nodejs": "https://nodejs.org/api/",
 }
 
-func getDocPages(toc *types.TableOfContents, baseUrl string) ([]*http.Response, error) {
+// fetch all the http responses for each page
+func getDocPages(toc *types.TableOfContents, baseUrl string, topicSelector string) ([]*http.Response, error) {
 	result := make([]*http.Response, len(toc.Toc))
 	for i, topic := range toc.Toc {
 		resolvedUrl, err := utils.ResolveUrl(baseUrl, topic.Link)
@@ -24,10 +25,10 @@ func getDocPages(toc *types.TableOfContents, baseUrl string) ([]*http.Response, 
 			return nil, err
 		}
 		resp, err := syncGet(resolvedUrl.String())
-		fmt.Println("got ", topic.Name)
 		if err != nil {
 			return nil, err
 		}
+		parser.ParseDocumentationPage(resp, topicSelector)
 		result[i] = resp
 	}
 	return result, nil
@@ -48,7 +49,7 @@ func GetDoc(docName string) (*types.Parsed, error) {
 		_ = err
 
 		tableOfContents, err := parser.ParseTableOfContents(httpResp, types.Doc{DocName: docName, DocUrl: url, DocPath: ""}, jsonStruct.Toc)
-		docPages, err := getDocPages(tableOfContents, url)
+		docPages, err := getDocPages(tableOfContents, url, jsonStruct.Topic)
 		_ = err
 		fmt.Println(docPages)
 		s, err := httpRespToBuffer(docPages[0].Body)

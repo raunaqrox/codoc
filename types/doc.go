@@ -1,5 +1,7 @@
 package types
 
+import "github.com/PuerkitoBio/goquery"
+
 type Doc struct {
 	DocName string
 	DocUrl  string
@@ -54,4 +56,8 @@ type DocOutputFormat struct {
 type Parsed struct {
 	DocInfo   Doc
 	ParsedDoc *DocOutputFormat
+}
+
+type Nodejs struct {
+	DocContent *goquery.Selection
 }

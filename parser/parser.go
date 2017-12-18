@@ -2,27 +2,42 @@ package parser
 
 import (
 	"codoc/types"
+	"fmt"
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ParseDocumentationPage(toParse *http.Response) *types.DocPage {
-	// topics :=
-	return nil
-}
-
-// Parse the http response to html document
-// apply the selections from the documentation json
-// return with the documentation format
-func ParseTableOfContents(toParse *http.Response, docInfo types.Doc, toc string) (*types.TableOfContents, error) {
+// Parse http response to DocPages
+func ParseDocumentationPage(toParse *http.Response, topicSelector string) (*types.DocPage, error) {
 	doc, err := goquery.NewDocumentFromResponse(toParse)
 
 	if err != nil {
 		return nil, err
 	}
 
-	tableOfContents := doc.Find(toc)
+	topics := doc.Find(topicSelector)
+	nodeDoc := &types.Nodejs{topics}
+	_ = nodeDoc
+
+	section := nodeDoc.Transform()
+	_ = section
+	// fmt.Printf("section %v", section)
+
+	return nil, nil
+}
+
+// Parse the http response to Table of contents of documentation
+// Apply the selections from the documentation json
+func ParseTableOfContents(toParse *http.Response, docInfo types.Doc, tocSelector string) (*types.TableOfContents, error) {
+	doc, err := goquery.NewDocumentFromResponse(toParse)
+
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(tocSelector)
+	tableOfContents := doc.Find(tocSelector)
 
 	return createDocToc(tableOfContents), nil
 	// TODO use this somewhere later
